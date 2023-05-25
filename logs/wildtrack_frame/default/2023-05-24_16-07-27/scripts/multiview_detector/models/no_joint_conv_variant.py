@@ -10,7 +10,7 @@ from multiview_detector.models.resnet import resnet18
 import matplotlib.pyplot as plt
 
 
-class PerspTransDetector(nn.Module):
+class NoJointConvVariant(nn.Module):
     def __init__(self, dataset, arch='resnet18'):
         super().__init__()
         self.num_cam = dataset.num_cam
@@ -48,10 +48,9 @@ class PerspTransDetector(nn.Module):
         # 2.5cm -> 0.5m: 20x
         self.img_classifier = nn.Sequential(nn.Conv2d(out_channel, 64, 1), nn.ReLU(),
                                             nn.Conv2d(64, 2, 1, bias=False)).to('cuda:0')
-        self.map_classifier = nn.Sequential(nn.Conv2d(out_channel * self.num_cam + 2, 512, 3, padding=1), nn.ReLU(),
-                                            # nn.Conv2d(512, 512, 5, 1, 2), nn.ReLU(),
-                                            nn.Conv2d(512, 512, 3, padding=2, dilation=2), nn.ReLU(),
-                                            nn.Conv2d(512, 1, 3, padding=4, dilation=4, bias=False)).to('cuda:0')
+        self.map_classifier = nn.Sequential(nn.Conv2d(out_channel * self.num_cam + 2, 512, 1), nn.ReLU(),
+                                            # nn.Conv2d(512, 512, 1), nn.ReLU(),
+                                            nn.Conv2d(512, 1, 1, bias=False)).to('cuda:0')
         pass
 
     def forward(self, imgs, visualize=False):
@@ -66,7 +65,7 @@ class PerspTransDetector(nn.Module):
             img_res = self.img_classifier(img_feature.to('cuda:0'))
             imgs_result.append(img_res)
             proj_mat = self.proj_mats[cam].repeat([B, 1, 1]).float().to('cuda:0')
-            world_feature = kornia.geometry.transform.warp_perspective(img_feature.to('cuda:0'), proj_mat, self.reducedgrid_shape)
+            world_feature = kornia.warp_perspective(img_feature.to('cuda:0'), proj_mat, self.reducedgrid_shape)
             if visualize:
                 plt.imshow(torch.norm(img_feature[0].detach(), dim=0).cpu().numpy())
                 plt.show()
@@ -125,7 +124,7 @@ def test():
     dataset = frameDataset(Wildtrack(os.path.expanduser('~/Data/Wildtrack')), transform=transform)
     dataloader = DataLoader(dataset, 1, False, num_workers=0)
     imgs, map_gt, imgs_gt, frame = next(iter(dataloader))
-    model = PerspTransDetector(dataset)
+    model = NoJointConvVariant(dataset)
     map_res, img_res = model(imgs, visualize=True)
     pass
 
