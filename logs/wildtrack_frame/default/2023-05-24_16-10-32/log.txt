@@ -1,0 +1,9 @@
+Settings:
+{'reID': False, 'cls_thres': 0.4, 'alpha': 1.0, 'variant': 'default', 'arch': 'resnet18', 'dataset': 'wildtrack', 'num_workers': 4, 'batch_size': 1, 'epochs': 10, 'lr': 0.1, 'weight_decay': 0.0005, 'momentum': 0.5, 'log_interval': 10, 'resume': None, 'visualize': False, 'seed': 1}
+Testing...
+moda: 0.0%, modp: 0.0%, precision: 0.0%, recall: 0.0%
+Test, Loss: 0.129820, Precision: 0.0%, Recall: 0.0, 	Time: 47.823
+Training...
+Train Epoch: 1, Batch:10, Loss: 0.052695, prec: 0.1%, recall: 0.5%, Time: 24.2 (f1.584+b1.101), maxima: 0.347
+Train Epoch: 1, Batch:20, Loss: 0.041284, prec: 0.0%, recall: 0.3%, Time: 34.3 (f0.914+b0.893), maxima: 0.274
+Train Epoch: 1, Batch:30, Loss: 0.032799, prec: 0.0%, recall: 0.2%, Time: 46.8 (f0.784+b0.830), maxima: 0.128

@@ -1,7 +1,11 @@
 import os
+<<<<<<< HEAD
 
 #os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
 
+=======
+  
+>>>>>>> 3339c0e5a415aac819680b3e381e792fff64c90f
 os.environ['OMP_NUM_THREADS'] = '1'
 import argparse
 import sys

@@ -83,6 +83,7 @@ This should automatically return evaluation results similar to the reported 88.2
 
 ### Pre-trained models
 You can download the checkpoints at this [link](https://anu365-my.sharepoint.com/:u:/g/personal/u6852178_anu_edu_au/Edhf_qajGMZLvlh9o6kByeUBxo_4E6DVjiQR2mrpGFtPjA?e=qEgiWR).
+<<<<<<< HEAD
 
 
 
@@ -91,3 +92,5 @@ You can download the checkpoints at this [link](https://anu365-my.sharepoint.com
 1. Instead of mapping the entire image feature maps onto the ground, we index ground grids and extract corresponding features from image feature maps
 2. Average pooling is implemented for all the extracted feature maps for final results regression
 
+=======
+>>>>>>> 3339c0e5a415aac819680b3e381e792fff64c90f
