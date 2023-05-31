@@ -111,17 +111,6 @@ class PerspTransDetector(nn.Module):
             img_feature = F.interpolate(img_feature, self.upsample_shape, mode='bilinear')   # upsampling to 270 h, 480 w 
             img_res = self.img_classifier(img_feature.to('cuda:0'))
             imgs_result.append(img_res)
-<<<<<<< HEAD
-=======
-            proj_mat = self.proj_mats[cam].repeat([B, 1, 1]).float().to('cuda:0')
-            world_feature = kornia.geometry.transform.warp_perspective(img_feature.to('cuda:0'), proj_mat, self.reducedgrid_shape)
-            if visualize:
-                plt.imshow(torch.norm(img_feature[0].detach(), dim=0).cpu().numpy())
-                plt.show()
-                plt.imshow(torch.norm(world_feature[0].detach(), dim=0).cpu().numpy())
-                plt.show()
-            world_features.append(world_feature.to('cuda:0'))
->>>>>>> 3339c0e5a415aac819680b3e381e792fff64c90f
 
             # need modification # 
            

@@ -1,3 +1,0 @@
-Settings:
-{'reID': False, 'cls_thres': 0.4, 'alpha': 1.0, 'variant': 'default', 'arch': 'resnet18', 'dataset': 'wildtrack', 'num_workers': 4, 'batch_size': 1, 'epochs': 10, 'lr': 0.1, 'weight_decay': 0.0005, 'momentum': 0.5, 'log_interval': 10, 'resume': None, 'visualize': False, 'seed': 1}
-Testing...
