@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import kornia
 from torchvision.models.vgg import vgg11
 from multiview_detector.models.resnet import resnet18
+#from attention_module import * 
 
 import matplotlib.pyplot as plt
 
@@ -88,6 +89,7 @@ class PerspTransDetector(nn.Module):
                                             nn.Conv2d(512, 512, 3, padding=2, dilation=2), nn.ReLU(),
                                             nn.Conv2d(512, 1, 3, padding=4, dilation=4, bias=False)).to('cuda:0')
         # modification ends
+#        self.transformer = Transformer(dim=self.out_channel, depth=2, heads=4, dim_head=128, mlp_dim=self.out_channel, out_dim=self.out_channel, dropout=0).cuda()
         pass
 
     def forward(self, imgs, visualize=False):
@@ -96,7 +98,7 @@ class PerspTransDetector(nn.Module):
         assert N == self.num_cam
         imgs_result = []
         #world_features = [] 
-        world_feature = torch.zeros([B, self.out_channel, self.reducedgrid_shape[0]*self.reducedgrid_shape[1]]).to("cuda:0")  # B C H W # modified 
+        #world_feature = torch.zeros([B, self.out_channel, self.reducedgrid_shape[0]*self.reducedgrid_shape[1]]).to("cuda:0")  # B C H W # modified 
         
         # create gound grid 
         xi = np.arange(0, self.reducedgrid_shape[0], 1) # 120 
@@ -105,6 +107,8 @@ class PerspTransDetector(nn.Module):
         world_grid = np.stack(np.meshgrid(xi, yi, indexing='ij')).reshape([2, -1])
         #world_feature = kornia.geometry.transform.warp_perspective(img_feature.to('cuda:0'), proj_mat, self.reducedgrid_shape)
         world_grid = torch.from_numpy(np.concatenate([world_grid, np.ones([1, world_grid.shape[1]])], axis=0)).float().to("cuda:0")
+
+        world_features = []
         for cam in range(self.num_cam):
             img_feature = self.base_pt1(imgs[:, cam].to('cuda:1'))
             img_feature = self.base_pt2(img_feature.to('cuda:0'))
@@ -139,7 +143,7 @@ class PerspTransDetector(nn.Module):
 
             img_feature_cp = img_feature.clone().view(B, self.out_channel, -1)
             ground_map = img_feature_cp[:, :, img_coord_1d] 
-            #world_feature = torch.zeros([B, self.out_channel, self.reducedgrid_shape[0]*self.reducedgrid_shape[1]]).to("cuda:0")  # B C H W # modified 
+            world_feature = torch.zeros([B, self.out_channel, self.reducedgrid_shape[0]*self.reducedgrid_shape[1]]).to("cuda:0")  # B C H W # modified 
             world_feature[:, :, torch.argwhere(mask_xy>0).squeeze()] += ground_map[:, :, :]
 
             ''' # for verification
