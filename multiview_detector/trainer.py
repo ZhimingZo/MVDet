@@ -41,10 +41,11 @@ class PerspectiveTrainer(BaseTrainer):
             t_f = time.time()
             t_forward += t_f - t_b
             loss = 0
-            for img_res, img_gt in zip(imgs_res, imgs_gt):
-                loss += self.criterion(img_res, img_gt.to(img_res.device), data_loader.dataset.img_kernel)
-            loss = self.criterion(map_res, map_gt.to(map_res.device), data_loader.dataset.map_kernel) + \
-                   loss / len(imgs_gt) * self.alpha
+            #for img_res, img_gt in zip(imgs_res, imgs_gt):
+            #    loss += self.criterion(img_res, img_gt.to(img_res.device), data_loader.dataset.img_kernel)
+            #loss = self.criterion(map_res, map_gt.to(map_res.device), data_loader.dataset.map_kernel) + \
+            #       loss / len(imgs_gt) * self.alpha
+            loss = self.criterion(map_res, map_gt.to(map_res.device), data_loader.dataset.map_kernel)
             loss.backward()
             optimizer.step()
             losses += loss.item()
@@ -128,8 +129,10 @@ class PerspectiveTrainer(BaseTrainer):
             subplt0 = fig.add_subplot(211, title="output")
             subplt1 = fig.add_subplot(212, title="target")
             subplt0.imshow(map_res.cpu().detach().numpy().squeeze())
-            subplt1.imshow(self.criterion._traget_transform(map_res, map_gt, data_loader.dataset.map_kernel)
+            subplt1.imshow(self.criterion._target_transform(map_res, map_gt, data_loader.dataset.map_kernel)
                            .cpu().detach().numpy().squeeze())
+            #subplt1.imshow(self.criterion.traget_transform(map_res, map_gt, data_loader.dataset.map_kernel)
+            #               .cpu().detach().numpy().squeeze())
             plt.savefig(os.path.join(self.logdir, 'map.jpg'))
             plt.close(fig)
 

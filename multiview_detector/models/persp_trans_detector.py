@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 class PerspTransDetector(nn.Module):
-    def __init__(self, dataset, arch='resnet18'):
+    def __init__(self, dataset, arch='resnet18', loss='klcc'):
         super().__init__()
         self.num_cam = dataset.num_cam
         self.img_shape, self.reducedgrid_shape = dataset.img_shape, dataset.reducedgrid_shape
@@ -84,9 +84,14 @@ class PerspTransDetector(nn.Module):
         #self.map_classifier = nn.Sequential(nn.Conv2d(self.out_channel, 512, 3, padding=1), nn.ReLU(),             
         #                                    nn.Conv2d(512, 512, 3, padding=2, dilation=2), nn.ReLU(),
         #                                    nn.Conv2d(512, 1, 3, padding=4, dilation=4, bias=False)).to('cuda:0')
-        self.map_classifier = nn.Sequential(nn.Conv2d(self.out_channel, 512, 3, padding=1), nn.ReLU(),             
+        if loss == 'mse':
+            self.map_classifier = nn.Sequential(nn.Conv2d(self.out_channel, 512, 3, padding=1), nn.ReLU(),             
                                             nn.Conv2d(512, 512, 3, padding=2, dilation=2), nn.ReLU(),
                                             nn.Conv2d(512, 1, 3, padding=4, dilation=4, bias=False)).to('cuda:0')
+        else: 
+            self.map_classifier = nn.Sequential(nn.Conv2d(self.out_channel+2, 512, 3, padding=1), nn.ReLU(),
+                                                nn.Conv2d(512, 512, 3, padding=2, dilation=2), nn.ReLU(),
+                                                nn.Conv2d(512, 1, 3, padding=4, dilation=4), nn.Sigmoid()).to('cuda:0')
         # modification ends
         pass
 
@@ -179,6 +184,7 @@ class PerspTransDetector(nn.Module):
         #exit()
         #map_result = self.map_classifier(world_features.to('cuda:0'))
         world_feature = world_feature.reshape(B, self.out_channel, self.reducedgrid_shape[0], self.reducedgrid_shape[1])/self.num_cam
+        world_feature = torch.cat([world_feature] + [self.coord_map.repeat([B, 1, 1, 1]).to('cuda:0')], dim=1)
         map_result = self.map_classifier(world_feature.to("cuda:0"))
         map_result = F.interpolate(map_result, self.reducedgrid_shape, mode='bilinear')
         

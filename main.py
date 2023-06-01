@@ -58,7 +58,7 @@ def main(args):
 
     # model
     if args.variant == 'default':
-        model = PerspTransDetector(train_set, args.arch)
+        model = PerspTransDetector(train_set, args.arch, args.loss)
     elif args.variant == 'img_proj':
         model = ImageProjVariant(train_set, args.arch)
     elif args.variant == 'res_proj':
@@ -73,8 +73,13 @@ def main(args):
                                                     epochs=args.epochs)
 
     # loss
-    criterion = GaussianMSE().cuda()
+    if args.loss =='mse':
+        criterion = GaussianMSE().cuda()
+    else:
+        from loss import Loss 
+        criterion = Loss(args.loss, args.k, args.p).cuda()
 
+        
     # logging
     logdir = f'logs/{args.dataset}_frame/{args.variant}/' + datetime.datetime.today().strftime('%Y-%m-%d_%H-%M-%S') \
         if not args.resume else f'logs/{args.dataset}_frame/{args.variant}/{args.resume}'
@@ -152,6 +157,11 @@ if __name__ == '__main__':
     parser.add_argument('--resume', type=str, default=None)
     parser.add_argument('--visualize', action='store_true')
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: None)')
+
+    # add GMVD klcc loss 
+    parser.add_argument('-l', '--loss', type=str, default='klcc', choices=['klcc', 'mse'], help="loss type klcc by default (|mse)")
+    parser.add_argument('--p', type=float, default=1.0, help='hyper parameter to control CC loss')
+    parser.add_argument('--k', type=float, default=1.0, help='hyper parameter to control KLDiv loss')
     args = parser.parse_args()
 
     main(args)

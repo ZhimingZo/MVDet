@@ -59,7 +59,7 @@ class Loss(nn.Module):
         
 
     def forward(self, x, target, kernel):
-        target = self.target_transform_(x, target, kernel)
+        target = self._target_transform(x, target, kernel)
         if self.loss_select == 'klcc':
             #### KL div + cc ####
             return (self.k*self.kldiv(x[0], target[0])) - (self.p*self.cc(x[0], target[0]))
@@ -67,7 +67,7 @@ class Loss(nn.Module):
         elif self.loss_select == 'mse':
             return F.mse_loss(x, target)
 
-    def target_transform_(self, x, target, kernel):
+    def _target_transform(self, x, target, kernel):
         target = F.adaptive_max_pool2d(target, x.shape[2:])
         with torch.no_grad():
             if self.loss_select == 'klcc':
